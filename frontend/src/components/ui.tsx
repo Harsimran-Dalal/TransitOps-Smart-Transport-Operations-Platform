@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState, type ReactNode } from "react";
+import { Sparkline } from "./Sparkline";
 
 const badgeMap: Record<string, string> = {
   AVAILABLE: "badge-gray",
@@ -64,12 +65,14 @@ export function KpiCard({
   value,
   suffix = "",
   icon,
+  sparkline,
   delay = 0
 }: {
   label: string;
   value: number;
   suffix?: string;
   icon: ReactNode;
+  sparkline?: number[];
   delay?: number;
 }) {
   return (
@@ -82,11 +85,14 @@ export function KpiCard({
     >
       <div className="kpi-glow" />
       <div className="kpi-icon">{icon}</div>
-      <div>
-        <p className="kpi-label">{label}</p>
-        <p className="kpi-value">
-          <AnimatedNumber value={value} suffix={suffix} />
-        </p>
+      <div className="kpi-body">
+        <div>
+          <p className="kpi-label">{label}</p>
+          <p className="kpi-value">
+            <AnimatedNumber value={value} suffix={suffix} />
+          </p>
+        </div>
+        {sparkline && sparkline.length > 0 && <Sparkline data={sparkline} />}
       </div>
     </motion.div>
   );

@@ -2,6 +2,7 @@ import { Fragment, useEffect, useMemo } from "react";
 import { MapContainer, TileLayer, Polyline, CircleMarker, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { LiveVehicleTrack } from "../lib/types";
+import { DriverAvatar } from "./DriverAvatar";
 
 function FitBounds({ tracks }: { tracks: LiveVehicleTrack[] }) {
   const map = useMap();
@@ -55,7 +56,10 @@ export function FleetMap({ tracks }: { tracks: LiveVehicleTrack[] }) {
               <Tooltip direction="top" offset={[0, -8]} opacity={1} permanent={false}>
                 <strong>{track.registrationNumber}</strong>
                 <br />
-                {track.driverName} · {track.elapsedMinutes}m en route
+                <span className="driver-cell fleet-map-driver">
+                  <DriverAvatar name={track.driverName} size="sm" />
+                  <span>{track.driverName} · {track.elapsedMinutes}m en route</span>
+                </span>
                 <br />
                 {track.source} → {track.destination}
               </Tooltip>

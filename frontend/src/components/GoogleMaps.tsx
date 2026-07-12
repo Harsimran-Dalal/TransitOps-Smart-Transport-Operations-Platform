@@ -1,4 +1,5 @@
 import type { Trip } from "../lib/types";
+import { DriverAvatar } from "./DriverAvatar";
 
 /** India-focused Google Maps helpers (no paid Maps JS SDK required). */
 
@@ -88,10 +89,15 @@ export function TripMapsPanel({ trips }: { trips: Trip[] }) {
           <div key={trip.id} className="trip-maps-row">
             <div>
               <strong>{trip.vehicle?.registrationNumber ?? "Vehicle"}</strong>
-              <p className="muted">
+              <p className="muted trip-maps-route">
                 {trip.source} → {trip.destination}
-                {trip.driver?.name ? ` · ${trip.driver.name}` : ""}
               </p>
+              {trip.driver && (
+                <span className="driver-cell trip-maps-driver">
+                  <DriverAvatar driverId={trip.driver.id} name={trip.driver.name} size="sm" />
+                  <span>{trip.driver.name}</span>
+                </span>
+              )}
             </div>
             <div className="trip-maps-links">
               <a

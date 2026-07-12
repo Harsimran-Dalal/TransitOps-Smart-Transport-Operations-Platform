@@ -14,12 +14,14 @@ import {
 } from "recharts";
 import { Activity, Car, Clock, MapPin, TrendingUp, Users, Wrench, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import { VEHICLE_TYPE_OPTIONS } from "@transitops/shared";
 import { api } from "../lib/api";
 import type { DashboardData, Paginated, Trip } from "../lib/types";
 import { liveQueryDefaults } from "../lib/live";
 import { FleetStatusBar } from "../components/TripCard";
 import { DispatchTrackingBoard } from "../components/DispatchTrackingBoard";
 import { TripMapsPanel } from "../components/GoogleMaps";
+import { VehicleTypeIcon } from "../components/VehicleTypeIcon";
 import { FleetGauge, KpiCard, PageHeader, Panel } from "../components/ui";
 import { SkeletonGrid, staggerContainer, staggerItem } from "../components/motion";
 
@@ -42,7 +44,7 @@ export function DashboardPage() {
   const onTripCount = (data?.activeVehicles ?? 0) - (data?.availableVehicles ?? 0) - (data?.inShopVehicles ?? 0);
 
   return (
-    <>
+    <div className="command-center">
       <PageHeader
         title="Fleet Command Center"
         subtitle={`Real-time logistics overview · Updated ${new Date(dataUpdatedAt).toLocaleTimeString()}`}
@@ -54,20 +56,36 @@ export function DashboardPage() {
       />
 
       <div className="filter-bar glass-filter">
-        {[
-          { key: "type", options: [["", "All types"], ["VAN", "Van"], ["TRUCK", "Truck"], ["BIKE", "Bike"]] },
-          { key: "status", options: [["", "All statuses"], ["AVAILABLE", "Available"], ["ON_TRIP", "On Trip"], ["IN_SHOP", "In Shop"]] }
-        ].map((f) => (
-          <select
-            key={f.key}
-            value={filters[f.key as keyof typeof filters]}
-            onChange={(e) => setFilters({ ...filters, [f.key]: e.target.value })}
+        <div className="vehicle-type-filter-chips">
+          <button
+            type="button"
+            className={`chip${!filters.type ? " active" : ""}`}
+            onClick={() => setFilters({ ...filters, type: "" })}
           >
-            {f.options.map(([v, l]) => (
+            All types
+          </button>
+          {VEHICLE_TYPE_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`chip${filters.type === opt.value ? " active" : ""}`}
+              onClick={() => setFilters({ ...filters, type: opt.value })}
+            >
+              <VehicleTypeIcon type={opt.value} size={14} />
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <select
+          value={filters.status}
+          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+        >
+          {[["", "All statuses"], ["AVAILABLE", "Available"], ["ON_TRIP", "On Trip"], ["IN_SHOP", "In Shop"]].map(
+            ([v, l]) => (
               <option key={v} value={v}>{l}</option>
-            ))}
-          </select>
-        ))}
+            )
+          )}
+        </select>
         <input
           placeholder="Region filter…"
           value={filters.region}
@@ -96,13 +114,40 @@ export function DashboardPage() {
 
       <Panel className="map-hero" delay={0.05}>
         <div className="panel-head">
-          <h3><MapPin size={16} /> Google Maps — active dispatches</h3>
-          <span className="muted">Routes across India · driver live location links</span>
+          <h3><MapPin size={16} /> Live fleet map</h3>
+          <span className="muted">
+            {(trips?.items ?? []).length} active dispatch{(trips?.items ?? []).length === 1 ? "" : "es"}
+          </span>
         </div>
         <TripMapsPanel trips={trips?.items ?? []} />
       </Panel>
 
       <div className="command-grid">
+        <Panel className="command-weekly" delay={0.08}>
+          <div className="panel-head">
+            <h3><TrendingUp size={16} /> Weekly performance</h3>
+            <span className="muted">Last 7 days</span>
+          </div>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={data?.weeklyPerformance ?? []} barGap={4}>
+              <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="4 4" vertical={false} />
+              <XAxis dataKey="label" stroke="#737373" tickLine={false} axisLine={false} />
+              <YAxis stroke="#737373" tickLine={false} axisLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ background: "var(--panel)", border: "1px solid var(--glass-border)", borderRadius: 8, color: "var(--text)" }}
+                formatter={(value: number, name: string) => {
+                  if (name === "revenue") return [`₹${value.toLocaleString()}`, "Revenue"];
+                  if (name === "trips") return [value, "Completed"];
+                  if (name === "dispatched") return [value, "Dispatched"];
+                  return [value, name];
+                }}
+              />
+              <Bar dataKey="dispatched" fill="rgba(255,255,255,0.28)" radius={[4, 4, 0, 0]} name="dispatched" animationDuration={900} />
+              <Bar dataKey="trips" fill="var(--accent)" radius={[4, 4, 0, 0]} name="trips" animationDuration={1000} />
+            </BarChart>
+          </ResponsiveContainer>
+        </Panel>
+
         <Panel className="command-main" delay={0.1}>
           <div className="panel-head">
             <h3><TrendingUp size={16} /> Utilization trend</h3>
@@ -165,6 +210,6 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </Panel>
       </div>
-    </>
+    </div>
   );
 }

@@ -23,7 +23,7 @@ export function buildPagination(page: number, limit: number, total: number) {
 }
 
 export function parseSort(sort?: string, allowed: string[] = ["createdAt"]) {
-  if (!sort) return { createdAt: "desc" as const };
+  if (!sort) return { [allowed[0] ?? "createdAt"]: "desc" as const };
   const desc = sort.startsWith("-");
   const field = desc ? sort.slice(1) : sort;
   if (!allowed.includes(field)) return { createdAt: "desc" as const };

@@ -113,3 +113,4 @@ export type TripStatus = z.infer<typeof tripStatusSchema>;
 export type VehicleType = z.infer<typeof vehicleTypeSchema>;
 
 export * from "./permissions.js";
+export * from "./vehicle-types.js";

@@ -15,7 +15,7 @@ import { fuelRouter, expensesRouter } from "./routes/fuel-expenses.js";
 import { dashboardRouter } from "./routes/dashboard.js";
 import { reportsRouter } from "./routes/reports.js";
 import { documentsRouter, notificationsRouter } from "./routes/documents.js";
-import { trackingRouter, aiRouter } from "./routes/tracking.js";
+import { trackingRouter } from "./routes/tracking.js";
 import { healthRouter } from "./routes/health.js";
 
 export function createApp() {
@@ -55,7 +55,6 @@ export function createApp() {
   app.use("/", documentsRouter);
   app.use("/notifications", notificationsRouter);
   app.use("/tracking", trackingRouter);
-  app.use("/ai", aiRouter);
 
   app.use((_request, _response, next) => next(new ApiError(404, "Not found")));
   app.use(errorHandler);

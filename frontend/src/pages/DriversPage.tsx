@@ -5,6 +5,7 @@ import type { Role } from "@transitops/shared";
 import { api } from "../lib/api";
 import type { Driver, Paginated, SessionUser } from "../lib/types";
 import { canWrite } from "../lib/permissions";
+import { DriverAvatar } from "../components/DriverAvatar";
 import { ListToolbar } from "../components/ListToolbar";
 import { Modal, PageHeader, Panel, StatusBadge } from "../components/ui";
 import { useToast } from "../context/ToastContext";
@@ -146,7 +147,12 @@ export function DriversPage({ user }: { user: SessionUser }) {
             <tbody>
               {data?.items.map((driver) => (
                 <tr key={driver.id}>
-                  <td><strong>{driver.name}</strong></td>
+                  <td>
+                    <span className="driver-cell">
+                      <DriverAvatar driverId={driver.id} name={driver.name} size="md" />
+                      <strong>{driver.name}</strong>
+                    </span>
+                  </td>
                   <td>{driver.licenseNumber}</td>
                   <td className="muted">{driver.email ?? "—"}</td>
                   <td className={isExpiringSoon(driver.licenseExpiryDate) ? "warn-cell" : ""}>

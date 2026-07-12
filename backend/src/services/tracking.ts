@@ -32,12 +32,14 @@ export async function getLiveFleetTracks(db: Db): Promise<LiveVehicleTrack[]> {
 
   return trips.map((trip) => {
     const distance = decimalToNumber(trip.plannedDistance);
-    const progress = estimateProgress(trip.dispatchedAt, distance);
+    const dispatchTime =
+      trip.dispatchedAt ?? (trip.status === TripStatus.DISPATCHED ? trip.updatedAt : null);
+    const progress = estimateProgress(dispatchTime, distance);
     const pos = interpolateRoute(trip.source, trip.destination, progress);
     const from = resolveLocation(trip.source);
     const to = resolveLocation(trip.destination);
-    const elapsedMinutes = trip.dispatchedAt
-      ? Math.floor((Date.now() - trip.dispatchedAt.getTime()) / 60_000)
+    const elapsedMinutes = dispatchTime
+      ? Math.floor((Date.now() - dispatchTime.getTime()) / 60_000)
       : 0;
 
     return {
@@ -55,7 +57,7 @@ export async function getLiveFleetTracks(db: Db): Promise<LiveVehicleTrack[]> {
         from: { lat: from.lat, lng: from.lng, label: trip.source },
         to: { lat: to.lat, lng: to.lng, label: trip.destination }
       },
-      dispatchedAt: trip.dispatchedAt?.toISOString() ?? null,
+      dispatchedAt: dispatchTime?.toISOString() ?? null,
       elapsedMinutes
     };
   });

@@ -1,11 +1,13 @@
 import { useDeferredValue, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileText, Pencil, Plus, Trash2 } from "lucide-react";
-import type { Role } from "@transitops/shared";
+import type { Role, VehicleType } from "@transitops/shared";
+import { VEHICLE_TYPE_OPTIONS, inferVehicleTypeFromModel } from "@transitops/shared";
 import { api } from "../lib/api";
 import type { Paginated, SessionUser, Vehicle } from "../lib/types";
 import { canWrite } from "../lib/permissions";
 import { ListToolbar } from "../components/ListToolbar";
+import { VehicleTypeIcon } from "../components/VehicleTypeIcon";
 import { Modal, PageHeader, Panel, StatusBadge } from "../components/ui";
 import { useToast } from "../context/ToastContext";
 import { liveQueryDefaults } from "../lib/live";
@@ -22,7 +24,7 @@ type VehicleDocument = {
 const defaultForm = {
   registrationNumber: "",
   nameModel: "",
-  type: "VAN" as const,
+  type: "VAN" as VehicleType,
   maximumLoadCapacity: "500",
   odometer: "0",
   acquisitionCost: "25000",
@@ -91,7 +93,7 @@ export function VehiclesPage({ user }: { user: SessionUser }) {
     setForm({
       registrationNumber: vehicle.registrationNumber,
       nameModel: vehicle.nameModel,
-      type: vehicle.type as typeof defaultForm.type,
+      type: vehicle.type as VehicleType,
       maximumLoadCapacity: String(vehicle.maximumLoadCapacity),
       odometer: String(vehicle.odometer),
       acquisitionCost: String(vehicle.acquisitionCost),
@@ -194,10 +196,9 @@ export function VehiclesPage({ user }: { user: SessionUser }) {
                 Type
                 <select value={type} onChange={(e) => setType(e.target.value)}>
                   <option value="">All</option>
-                  <option value="VAN">Van</option>
-                  <option value="TRUCK">Truck</option>
-                  <option value="BIKE">Bike</option>
-                  <option value="OTHER">Other</option>
+                  {VEHICLE_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
                 </select>
               </label>
               <label className="filter-control">
@@ -240,7 +241,7 @@ export function VehiclesPage({ user }: { user: SessionUser }) {
                 <tr key={vehicle.id}>
                   <td><strong>{vehicle.registrationNumber}</strong></td>
                   <td>{vehicle.nameModel}</td>
-                  <td>{vehicle.type}</td>
+                  <td><VehicleTypeIcon type={vehicle.type} showLabel /></td>
                   <td>{vehicle.maximumLoadCapacity}</td>
                   <td>{vehicle.region}</td>
                   <td><StatusBadge status={vehicle.status} /></td>
@@ -276,10 +277,25 @@ export function VehiclesPage({ user }: { user: SessionUser }) {
       >
         <div className="form-grid">
           <label>Registration<input value={form.registrationNumber} onChange={(e) => setForm({ ...form, registrationNumber: e.target.value })} /></label>
-          <label>Model<input value={form.nameModel} onChange={(e) => setForm({ ...form, nameModel: e.target.value })} /></label>
+          <label>Model
+            <input
+              value={form.nameModel}
+              onChange={(e) => {
+                const nameModel = e.target.value;
+                const inferred = !editing ? inferVehicleTypeFromModel(nameModel) : null;
+                setForm({
+                  ...form,
+                  nameModel,
+                  ...(inferred ? { type: inferred } : {})
+                });
+              }}
+            />
+          </label>
           <label>Type
-            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as typeof form.type })}>
-              <option value="VAN">Van</option><option value="TRUCK">Truck</option><option value="BIKE">Bike</option><option value="OTHER">Other</option>
+            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as VehicleType })}>
+              {VEHICLE_TYPE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </select>
           </label>
           <label>Status

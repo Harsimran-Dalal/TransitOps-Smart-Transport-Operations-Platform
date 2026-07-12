@@ -1,4 +1,4 @@
-import type { Role } from "@transitops/shared";
+import type { Role, VehicleType } from "@transitops/shared";
 
 export type SessionUser = {
   id: string;
@@ -19,7 +19,7 @@ export type Vehicle = {
   id: string;
   registrationNumber: string;
   nameModel: string;
-  type: string;
+  type: VehicleType;
   maximumLoadCapacity: string;
   odometer: string;
   acquisitionCost: string;
@@ -55,6 +55,7 @@ export type Trip = {
   dispatchedAt?: string | null;
   completedAt?: string | null;
   createdAt?: string;
+  updatedAt?: string | null;
   vehicle?: Vehicle;
   driver?: Driver;
 };
@@ -103,6 +104,15 @@ export type DashboardData = {
   driversOnDuty: number;
   fleetUtilization: number;
   utilizationTrend: { label: string; value: number }[];
+  weeklyPerformance: { label: string; trips: number; dispatched: number; revenue: number }[];
+  kpiSparklines: {
+    activeVehicles: number[];
+    availableVehicles: number[];
+    inShopVehicles: number[];
+    activeTrips: number[];
+    pendingTrips: number[];
+    driversOnDuty: number[];
+  };
   costBreakdown: { label: string; value: number }[];
 };
 

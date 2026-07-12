@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import type { Trip } from "../lib/types";
+import { tripDispatchTime } from "../lib/trip-time";
+import { DriverAvatar } from "./DriverAvatar";
+import { VehicleTypeIcon } from "./VehicleTypeIcon";
 import { StatusBadge } from "./ui";
 
 function formatElapsed(iso: string) {
@@ -19,6 +22,7 @@ export function TripCard({
   actions?: React.ReactNode;
   index?: number;
 }) {
+  const dispatchTime = tripDispatchTime(trip);
   return (
     <motion.article
       className="trip-card"
@@ -55,20 +59,38 @@ export function TripCard({
       <div className="trip-card-meta">
         <div>
           <span className="meta-label">Vehicle</span>
-          <span>{trip.vehicle?.registrationNumber ?? "—"}</span>
+          <span className="driver-cell">
+            {trip.vehicle ? (
+              <>
+                <VehicleTypeIcon type={trip.vehicle.type} size={14} />
+                <span>{trip.vehicle.registrationNumber}</span>
+              </>
+            ) : (
+              <span>—</span>
+            )}
+          </span>
         </div>
         <div>
           <span className="meta-label">Driver</span>
-          <span>{trip.driver?.name ?? "—"}</span>
+          <span className="driver-cell">
+            {trip.driver ? (
+              <>
+                <DriverAvatar driverId={trip.driver.id} name={trip.driver.name} size="sm" />
+                <span>{trip.driver.name}</span>
+              </>
+            ) : (
+              <span>—</span>
+            )}
+          </span>
         </div>
         <div>
           <span className="meta-label">Cargo</span>
           <span>{trip.cargoWeight} kg</span>
         </div>
-        {trip.status === "DISPATCHED" && trip.dispatchedAt && (
+        {trip.status === "DISPATCHED" && dispatchTime && (
           <div>
             <span className="meta-label">En route</span>
-            <span>{formatElapsed(trip.dispatchedAt)}</span>
+            <span>{formatElapsed(dispatchTime)}</span>
           </div>
         )}
         {trip.liveLocationUrl && (

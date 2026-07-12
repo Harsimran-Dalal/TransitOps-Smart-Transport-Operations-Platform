@@ -12,6 +12,22 @@ import { liveQueryDefaults } from "../lib/live";
 type FuelLog = { id: string; vehicleId: string; liters: string; cost: string; recordedAt: string; vehicle?: Vehicle };
 type Expense = { id: string; vehicleId: string; type: string; amount: string; recordedAt: string; vehicle?: Vehicle };
 
+function normalizeDecimal(value: string) {
+  return value.trim().replace(/^\$/, "").replace(/,/g, "");
+}
+
+function apiErrorMessage(err: unknown, fallback: string) {
+  const data = (err as { response?: { data?: { error?: string; details?: Record<string, string[] | undefined> } } })
+    ?.response?.data;
+  if (!data) return fallback;
+  const detail = data.details
+    ? Object.entries(data.details)
+        .flatMap(([field, messages]) => (messages ?? []).map((message) => `${field}: ${message}`))
+        .join("; ")
+    : "";
+  return [data.error, detail].filter(Boolean).join(" — ") || fallback;
+}
+
 export function FuelExpensesPage({ user }: { user: SessionUser }) {
   const qc = useQueryClient();
   const [tab, setTab] = useState<"fuel" | "expense">("fuel");
@@ -21,7 +37,7 @@ export function FuelExpensesPage({ user }: { user: SessionUser }) {
   const [fuelForm, setFuelForm] = useState({ vehicleId: "", liters: "40", cost: "56" });
   const [expenseForm, setExpenseForm] = useState({ vehicleId: "", type: "Toll", amount: "12" });
 
-  const { data: fuelLogs } = useQuery({
+  const { data: fuelLogs, isError: fuelLogsError, error: fuelLogsLoadError } = useQuery({
     queryKey: ["fuel-logs"],
     queryFn: async () => (await api.get<Paginated<FuelLog>>("/fuel-logs")).data,
     ...liveQueryDefaults
@@ -39,15 +55,39 @@ export function FuelExpensesPage({ user }: { user: SessionUser }) {
   });
 
   const createFuel = useMutation({
-    mutationFn: async () => (await api.post("/fuel-logs", fuelForm)).data,
-    onSuccess: async () => { setShowForm(false); toast("Fuel log saved", "success"); await qc.invalidateQueries(); },
-    onError: (err: any) => toast(err.response?.data?.error ?? "Failed to log fuel", "error")
+    mutationFn: async () =>
+      (
+        await api.post("/fuel-logs", {
+          vehicleId: fuelForm.vehicleId,
+          liters: normalizeDecimal(fuelForm.liters),
+          cost: normalizeDecimal(fuelForm.cost)
+        })
+      ).data,
+    onSuccess: async () => {
+      setShowForm(false);
+      setFuelForm({ vehicleId: "", liters: "40", cost: "56" });
+      toast("Fuel log saved", "success");
+      await qc.invalidateQueries({ queryKey: ["fuel-logs"] });
+    },
+    onError: (err: unknown) => toast(apiErrorMessage(err, "Failed to log fuel"), "error")
   });
 
   const createExpense = useMutation({
-    mutationFn: async () => (await api.post("/expenses", expenseForm)).data,
-    onSuccess: async () => { setShowForm(false); toast("Expense saved", "success"); await qc.invalidateQueries(); },
-    onError: (err: any) => toast(err.response?.data?.error ?? "Failed to log expense", "error")
+    mutationFn: async () =>
+      (
+        await api.post("/expenses", {
+          vehicleId: expenseForm.vehicleId,
+          type: expenseForm.type.trim(),
+          amount: normalizeDecimal(expenseForm.amount)
+        })
+      ).data,
+    onSuccess: async () => {
+      setShowForm(false);
+      setExpenseForm({ vehicleId: "", type: "Toll", amount: "12" });
+      toast("Expense saved", "success");
+      await qc.invalidateQueries({ queryKey: ["expenses"] });
+    },
+    onError: (err: unknown) => toast(apiErrorMessage(err, "Failed to log expense"), "error")
   });
 
   return (
@@ -66,6 +106,9 @@ export function FuelExpensesPage({ user }: { user: SessionUser }) {
       </div>
 
       <Panel>
+        {fuelLogsError && tab === "fuel" && (
+          <p className="form-error">{apiErrorMessage(fuelLogsLoadError, "Could not load fuel logs")}</p>
+        )}
         {tab === "fuel" ? (
           <div className="table-wrap">
             <table>
@@ -118,7 +161,13 @@ export function FuelExpensesPage({ user }: { user: SessionUser }) {
               <label>Liters<input value={fuelForm.liters} onChange={(e) => setFuelForm({ ...fuelForm, liters: e.target.value })} /></label>
               <label>Cost<input value={fuelForm.cost} onChange={(e) => setFuelForm({ ...fuelForm, cost: e.target.value })} /></label>
             </div>
-            <button className="btn-primary" onClick={() => createFuel.mutate()} disabled={!fuelForm.vehicleId}>Save fuel log</button>
+            <button
+              className="btn-primary"
+              onClick={() => createFuel.mutate()}
+              disabled={!fuelForm.vehicleId || createFuel.isPending}
+            >
+              {createFuel.isPending ? "Saving…" : "Save fuel log"}
+            </button>
           </>
         ) : (
           <>
@@ -132,7 +181,13 @@ export function FuelExpensesPage({ user }: { user: SessionUser }) {
               <label>Type<input value={expenseForm.type} onChange={(e) => setExpenseForm({ ...expenseForm, type: e.target.value })} /></label>
               <label>Amount<input value={expenseForm.amount} onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })} /></label>
             </div>
-            <button className="btn-primary" onClick={() => createExpense.mutate()} disabled={!expenseForm.vehicleId}>Save expense</button>
+            <button
+              className="btn-primary"
+              onClick={() => createExpense.mutate()}
+              disabled={!expenseForm.vehicleId || createExpense.isPending}
+            >
+              {createExpense.isPending ? "Saving…" : "Save expense"}
+            </button>
           </>
         )}
       </Modal>

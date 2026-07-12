@@ -12,7 +12,6 @@ import {
   Sun,
   Radio,
   Bell,
-  Sparkles,
   Settings as SettingsIcon
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -23,7 +22,6 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { LIVE_REFETCH_MS } from "../lib/live";
 import { NotificationPanel, useNotificationCount } from "./NotificationPanel";
-import { FleetCopilot } from "./FleetCopilot";
 
 const navItems = [
   { path: "/dashboard", label: "Command Center", icon: LayoutDashboard, section: "dashboard" },
@@ -52,7 +50,6 @@ export function AppLayout({
   const location = useLocation();
   const queryClient = useQueryClient();
   const [notifOpen, setNotifOpen] = useState(false);
-  const [copilotOpen, setCopilotOpen] = useState(false);
   const notifCount = useNotificationCount();
   const role = user.role as Role;
   const visibleNav = navItems.filter((item) => canRead(role, item.section));
@@ -151,15 +148,6 @@ export function AppLayout({
               <span className="pulse" />
               {isFetching ? "Updating…" : "Fleet online"}
             </div>
-            <button
-              type="button"
-              className="btn-copilot"
-              onClick={() => setCopilotOpen(true)}
-              title="Fleet Copilot — AI search"
-            >
-              <Sparkles size={16} />
-              <span>Ask fleet</span>
-            </button>
             <div className="notif-trigger-wrap">
               <button
                 type="button"
@@ -181,7 +169,6 @@ export function AppLayout({
         </header>
         <main className="page-content">{children}</main>
       </div>
-      <FleetCopilot open={copilotOpen} onClose={() => setCopilotOpen(false)} />
     </div>
   );
 }

@@ -1,6 +1,9 @@
 import { useMemo } from "react";
-import { ExternalLink, Clock, MapPin, Truck, User } from "lucide-react";
+import { ExternalLink, Clock, MapPin } from "lucide-react";
+import { DriverAvatar } from "./DriverAvatar";
+import { VehicleTypeIcon } from "./VehicleTypeIcon";
 import type { Trip } from "../lib/types";
+import { tripDispatchTime } from "../lib/trip-time";
 import { googleDirectionsUrl } from "./GoogleMaps";
 
 function formatElapsed(iso?: string | null) {
@@ -41,17 +44,21 @@ export function DispatchTrackingBoard({ trips }: { trips: Trip[] }) {
             </tr>
           </thead>
           <tbody>
-            {active.map((trip) => (
+            {active.map((trip) => {
+              const dispatchTime = tripDispatchTime(trip);
+              return (
               <tr key={trip.id}>
                 <td>
                   <span className="dispatch-cell">
-                    <Truck size={14} />
+                    <VehicleTypeIcon type={trip.vehicle?.type ?? "OTHER"} size={14} />
                     {trip.vehicle?.registrationNumber ?? "—"}
                   </span>
                 </td>
                 <td>
                   <span className="dispatch-cell">
-                    <User size={14} />
+                    {trip.driver ? (
+                      <DriverAvatar driverId={trip.driver.id} name={trip.driver.name} size="sm" />
+                    ) : null}
                     {trip.driver?.name ?? "—"}
                   </span>
                 </td>
@@ -61,11 +68,11 @@ export function DispatchTrackingBoard({ trips }: { trips: Trip[] }) {
                     {trip.source} → {trip.destination}
                   </span>
                 </td>
-                <td>{trip.dispatchedAt ? new Date(trip.dispatchedAt).toLocaleString() : "—"}</td>
+                <td>{dispatchTime ? new Date(dispatchTime).toLocaleString() : "—"}</td>
                 <td>
                   <span className="dispatch-elapsed">
                     <Clock size={14} />
-                    {formatElapsed(trip.dispatchedAt)}
+                    {formatElapsed(dispatchTime)}
                   </span>
                 </td>
                 <td>
@@ -86,7 +93,8 @@ export function DispatchTrackingBoard({ trips }: { trips: Trip[] }) {
                   <span className="dispatch-live-pill">On dispatch</span>
                 </td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>
