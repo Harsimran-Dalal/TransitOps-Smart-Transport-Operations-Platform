@@ -1,0 +1,20 @@
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]
+
+[phases.install]
+cmds = ["npm install --workspaces --include-workspace-root"]
+
+[phases.build]
+cmds = [
+  "npm run build --workspace=@transitops/shared",
+  "npm run build --workspace=@transitops/backend"
+]
+
+[start]
+cmd = "cd backend && npx prisma db push --accept-data-loss && node dist/server.js"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 120

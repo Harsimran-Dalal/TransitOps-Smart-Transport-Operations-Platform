@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  FLEET_MANAGER
+  DRIVER
+  SAFETY_OFFICER
+  FINANCIAL_ANALYST
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  ON_TRIP
+  IN_SHOP
+  RETIRED
+}
+
+enum DriverStatus {
+  AVAILABLE
+  ON_TRIP
+  OFF_DUTY
+  SUSPENDED
+}
+
+enum TripStatus {
+  DRAFT
+  DISPATCHED
+  COMPLETED
+  CANCELLED
+}
+
+enum VehicleType {
+  TRUCK
+  VAN
+  BIKE
+  OTHER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String?
+  googleId     String?  @unique
+  name         String?
+  avatarUrl    String?
+  authProvider String   @default("local")
+  role         Role
+  driverId     String?  @unique
+  driver       Driver?  @relation(fields: [driverId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Vehicle {
+  id                  String            @id @default(uuid())
+  registrationNumber  String            @unique
+  nameModel           String
+  type                VehicleType
+  maximumLoadCapacity Decimal           @db.Decimal(12, 2)
+  odometer            Decimal           @db.Decimal(12, 2)
+  acquisitionCost     Decimal           @db.Decimal(12, 2)
+  region              String
+  status              VehicleStatus     @default(AVAILABLE)
+  trips               Trip[]
+  maintenanceLogs     MaintenanceLog[]
+  fuelLogs            FuelLog[]
+  expenses            Expense[]
+  documents           VehicleDocument[]
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+}
+
+model Driver {
+  id                String       @id @default(uuid())
+  name              String
+  licenseNumber     String       @unique
+  licenseCategory   String
+  licenseExpiryDate DateTime
+  contactNumber     String
+  email             String?
+  safetyScore       Decimal      @db.Decimal(5, 2)
+  status            DriverStatus @default(AVAILABLE)
+  trips             Trip[]
+  user              User?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model Trip {
+  id              String     @id @default(uuid())
+  source          String
+  destination     String
+  vehicleId       String
+  driverId        String
+  cargoWeight     Decimal    @db.Decimal(12, 2)
+  plannedDistance Decimal    @db.Decimal(12, 2)
+  finalOdometer   Decimal?   @db.Decimal(12, 2)
+  fuelConsumed    Decimal?   @db.Decimal(12, 2)
+  revenue         Decimal    @default(0) @db.Decimal(12, 2)
+  status          TripStatus @default(DRAFT)
+  liveLocationUrl String?
+  dispatchedAt    DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  vehicle         Vehicle    @relation(fields: [vehicleId], references: [id])
+  driver          Driver     @relation(fields: [driverId], references: [id])
+}
+
+model MaintenanceLog {
+  id          String    @id @default(uuid())
+  vehicleId   String
+  description String
+  cost        Decimal   @db.Decimal(12, 2)
+  openedAt    DateTime  @default(now())
+  closedAt    DateTime?
+  isOpen      Boolean   @default(true)
+  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id])
+}
+
+model FuelLog {
+  id         String   @id @default(uuid())
+  vehicleId  String
+  liters     Decimal  @db.Decimal(12, 2)
+  cost       Decimal  @db.Decimal(12, 2)
+  recordedAt DateTime @default(now())
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+model Expense {
+  id         String   @id @default(uuid())
+  vehicleId  String
+  type       String
+  amount     Decimal  @db.Decimal(12, 2)
+  recordedAt DateTime @default(now())
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+model VehicleDocument {
+  id         String   @id @default(uuid())
+  vehicleId  String
+  fileName   String
+  filePath   String
+  mimeType   String
+  uploadedAt DateTime @default(now())
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id])
+}
