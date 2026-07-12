@@ -49,7 +49,7 @@ Authentication is **email and password only** — users pick their role at signu
 
 ---
 
-## 📸 Demo
+## Demo
 
 | Command Center | Fleet Registry | Live Trip Operations |
 |---|---|---|
