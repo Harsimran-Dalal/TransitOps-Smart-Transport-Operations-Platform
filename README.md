@@ -1,87 +1,35 @@
 <div align="center">
 
-# 🚛 TransitOps
+# 🚛 TransitOps 🚛
 
-### Smart Transport Operations Platform for Indian Logistics
+**Smart Transport Operations Platform** — fleet management, dispatch, compliance, and analytics built for Indian logistics teams.
 
-**Fleet · Dispatch · Compliance · Analytics — in one live dashboard.**
-
-[![Live App](https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge)](https://transitops-pi.vercel.app)
-[![API Health](https://img.shields.io/badge/API-online-blue?style=for-the-badge)](https://transitops-api-production-fbce.up.railway.app/health)
-[![GitHub](https://img.shields.io/badge/GitHub-repo-181717?style=for-the-badge&logo=github)](https://github.com/Harsimran-Dalal/TransitOps-Smart-Transport-Operations-Platform)
-[![License](https://img.shields.io/badge/license-Hackathon--Use-orange?style=for-the-badge)](#license)
-
-![React](https://img.shields.io/badge/React_18-149ECA?logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
-![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-336791?logo=postgresql&logoColor=white)
-![Gemini](https://img.shields.io/badge/Gemini_API-Fleet_Copilot-8E75B2?logo=googlegemini&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-Frontend-black?logo=vercel)
-![Railway](https://img.shields.io/badge/Railway-Backend-0B0D0E?logo=railway)
-
-[**Live Demo**](https://transitops-pi.vercel.app) · [**Demo Video**](#-demo) · [**Quick Start**](#-local-development) · [**API Docs**](#-api-reference) · [**Architecture**](#-architecture)
-
-</div>
-
----
-
-> **Note on this README:** the badges, sections, and structure below follow common patterns from well-received open-source and hackathon READMEs (highlights-first, visuals, quick start, architecture diagrams, judge-facing summary). Whether *this specific project* wins anything depends on the judging criteria and live demo — a README improves presentation, it doesn't substitute for it. Screenshots below are from the live app; a demo video link is still a placeholder.
-
-## 🎯 The problem
-
-Indian logistics operators — from single-owner fleets to regional carriers — run dispatch over phone calls and WhatsApp, track compliance on paper, and reconcile fuel costs in spreadsheets. Vehicle downtime, license expiries, and cost overruns get caught late because there's no single live view of the fleet.
-
-## 💡 The solution
-
-TransitOps gives four fleet roles (Manager, Driver/Dispatcher, Safety Officer, Financial Analyst) one shared, live, role-permissioned system: register vehicles/drivers, dispatch trips with real-time GPS-link tracking, log maintenance and fuel automatically, and export analytics — built with India-specific defaults (₹, +91, MH-style plates, Indian city autocomplete) instead of a generic US template.
-
-## 📸 Demo
-
-| Command Center | Fleet Registry | Live Trip Operations |
-|---|---|---|
-| <img alt="command-center" src="https://github.com/user-attachments/assets/cbc5763e-209c-4f39-a3b7-423f11ce103c" width="300" /> | <img alt="fleet-registry" src="https://github.com/user-attachments/assets/4552abab-ef70-4eaf-b801-25b5f71af2ec" width="300" /> | <img alt="live-trips" src="https://github.com/user-attachments/assets/fd258ae0-dfd7-42af-ae7a-75ce6e5e8a9a" width="300" /> |
-
-**Live app:** [transitops-pi.vercel.app](https://transitops-pi.vercel.app) · **3-minute walkthrough:** `[add YouTube/Loom link]`
-
-> Screenshots are checked into `docs/screenshots/`. If they don't render on GitHub, confirm the folder was pushed (Step 4 of [Upload to GitHub](#upload-to-github)).
-
----
-
-## 🏆 Why this stands out (judge-facing summary)
-
-- **Not a CRUD toy** — real RBAC enforced on the backend (not just hidden UI), atomic state transitions (dispatch/complete/cancel), and a license-expiry cron with email reminders.
-- **AI that's actually wired in** — Fleet Copilot (Gemini) answers natural-language questions over *live* fleet data via a real backend route (`/ai/ask`), not a static chatbot demo.
-- **Deployed, not just running locally** — frontend on Vercel, API + Postgres (Neon) on Railway, with a working `/health` endpoint judges can hit directly.
-- **Region-specific, not generic** — every default (currency, phone format, registration plates, city autocomplete) is built for the Indian logistics market this targets.
-- **Zero paid API keys required for the demo** — Google Maps live tracking uses share links, not the billed Maps JavaScript SDK.
-
-<sub>These are factual claims about what the codebase implements per the spec below — **[Unverified]** in the sense that I haven't run or tested this deployment myself; verify the live links above still resolve before presenting.</sub>
+| | |
+|---|---|
+| **Live app** | [transitops-pi.vercel.app](https://transitops-pi.vercel.app) |
+| **API** | [transitops-api-production-fbce.up.railway.app](https://transitops-api-production-fbce.up.railway.app) |
+| **Health** | [GET /health](https://transitops-api-production-fbce.up.railway.app/health) |
+| **Stack** | React · Express · Prisma · PostgreSQL (Neon) |
+| **Deploy** | Vercel (frontend) + Railway (backend) |
 
 ---
 
 ## Table of contents
 
-1. [Demo](#-demo)
-2. [Overview](#overview)
-3. [Architecture](#architecture)
-4. [Repository structure](#repository-structure)
-5. [Features](#features)
-6. [Extra features (beyond spec)](#extra-features-beyond-spec)
-7. [Roles & permissions](#roles--permissions)
-8. [Tech stack](#tech-stack)
-9. [Local development](#local-development)
-10. [Deployment](#deployment)
-11. [Environment variables](#environment-variables)
-12. [API reference](#api-reference)
-13. [Business rules](#business-rules)
-14. [KPI definitions](#kpi-definitions)
-15. [Roadmap](#-roadmap)
-16. [Team](#-team)
-17. [Contributing](#-contributing)
-18. [FAQ](#-faq)
-19. [Upload to GitHub](#upload-to-github)
-20. [License](#license)
+1. [Overview](#overview)
+2. [Architecture](#architecture)
+3. [Repository structure](#repository-structure)
+4. [Features](#features)
+5. [Extra features (beyond spec)](#extra-features-beyond-spec)
+6. [Roles & permissions](#roles--permissions)
+7. [Tech stack](#tech-stack)
+8. [Local development](#local-development)
+9. [Deployment](#deployment)
+10. [Environment variables](#environment-variables)
+11. [API reference](#api-reference)
+12. [Business rules](#business-rules)
+13. [KPI definitions](#kpi-definitions)
+14. [Upload to GitHub](#upload-to-github)
 
 ---
 
@@ -200,7 +148,7 @@ TransitOps/
 │   │   │                    tracking, notifications
 │   │   ├── services/        Business logic per domain
 │   │   ├── middleware/      auth, RBAC, error handler
-│   │   └── jobs/             License expiry cron
+│   │   └── jobs/            License expiry cron
 │   └── prisma/
 │       ├── schema.prisma
 │       ├── migrations/
@@ -304,8 +252,8 @@ Write = create, edit, delete, dispatch. Read = view only.
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/Harsimran-Dalal/TransitOps-Smart-Transport-Operations-Platform.git
-cd TransitOps-Smart-Transport-Operations-Platform
+git clone <your-repo-url>
+cd TransitOps
 npm install
 ```
 
@@ -354,8 +302,6 @@ npm run dev:all
 | finance@transitops.in | Password123! | Financial Analyst |
 
 Seed also creates: **MH-02-AB-1234** (Tata Ace), driver **Rajesh Kumar**, and a completed Mumbai → Nhava Sheva trip.
-
-> **For judges in a hurry:** live app is already seeded — [transitops-pi.vercel.app](https://transitops-pi.vercel.app), login as `manager@transitops.in` / `Password123!`. No local setup needed.
 
 ---
 
@@ -512,64 +458,11 @@ All endpoints except `/auth/login`, `/auth/register`, and `/health` require an a
 
 ---
 
-## 🗺 Roadmap
-
-Post-hackathon direction — **[Speculation]**, not committed:
-
-- [ ] Native GPS ingestion (replace share-link tracking) via a driver mobile app
-- [ ] Route optimization (multi-stop, cost-aware)
-- [ ] SMS/WhatsApp notifications alongside email
-- [ ] Multi-tenant support for fleet operators managing sub-fleets
-- [ ] Predictive maintenance from fuel/usage patterns
-
----
-
-## 👥 Team
-
-| Name | Role | GitHub |
-|------|------|--------|
-| `[Add name]` | `[e.g. Full-stack, Frontend]` | `[@handle]` |
-| `[Add name]` | `[e.g. Backend, DB]` | `[@handle]` |
-
-> **[Unverified]** — placeholder table; fill in actual team members before submission.
-
----
-
-## 🤝 Contributing
-
-Built during a hackathon; contributions welcome post-event.
-
-```bash
-git checkout -b feature/your-feature
-# make changes
-git commit -m "feat: describe your change"
-git push origin feature/your-feature
-```
-
-Open a PR against `main` with a short description and, if UI-facing, a before/after screenshot.
-
----
-
-## ❓ FAQ
-
-**Does live tracking need a paid Google Maps API key?**
-No — it uses the driver's Google Maps *share link* (Share → Live location), not the billed Maps JavaScript SDK.
-
-**Is Fleet Copilot required to run the app?**
-No — `GEMINI_API_KEY` is optional. Without it, `/ai/status` reports the Copilot as disabled and the rest of the platform functions normally.
-
-**What happens if the license reminder cron isn't enabled?**
-`ENABLE_LICENSE_CRON` defaults to off; enable it in `backend/.env` to run daily expiry checks.
-
----
-
 ## Upload to GitHub
 
 Follow these steps to publish your project. **Do not commit `.env` files or API keys.**
 
 ### Step 1 — Create a GitHub repository
-
-> Already done for this project: [github.com/Harsimran-Dalal/TransitOps-Smart-Transport-Operations-Platform](https://github.com/Harsimran-Dalal/TransitOps-Smart-Transport-Operations-Platform). Skip to Step 2.
 
 1. Go to [github.com/new](https://github.com/new).
 2. Name it `TransitOps` (or your preferred name).
@@ -622,21 +515,21 @@ git commit -m "Initial commit: TransitOps fleet operations platform"
 
 ### Step 5 — Connect to GitHub and push
 
-Repo already exists at [Harsimran-Dalal/TransitOps-Smart-Transport-Operations-Platform](https://github.com/Harsimran-Dalal/TransitOps-Smart-Transport-Operations-Platform) — skip Step 1 and just push:
+Replace `YOUR_USERNAME` and `YOUR_REPO` with your GitHub details:
 
 ```powershell
-git remote add origin https://github.com/Harsimran-Dalal/TransitOps-Smart-Transport-Operations-Platform.git
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
 git push -u origin main
 ```
 
-If the remote already exists, use `git remote set-url origin <url>` instead. If prompted, sign in with GitHub (browser or personal access token).
+If prompted, sign in with GitHub (browser or personal access token).
 
 ### Step 6 — Verify on GitHub
 
 1. Open your repo on GitHub.
 2. Confirm `README.md` renders with the architecture diagram.
 3. Confirm `.env` files are **not** visible in the file tree.
-4. Optionally add repo topics: `fleet-management`, `logistics`, `react`, `express`, `prisma`, `hackathon`, `hackathon-project`.
+4. Optionally add repo topics: `fleet-management`, `logistics`, `react`, `express`, `prisma`, `hackathon`.
 
 ### Step 7 — Connect deploy platforms (optional)
 
