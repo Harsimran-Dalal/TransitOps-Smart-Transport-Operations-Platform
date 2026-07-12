@@ -1,4 +1,4 @@
-# TransitOps
+# 🚛 TransitOps 🚛
 
 **Smart Transport Operations Platform** — fleet management, dispatch, compliance, and analytics built for Indian logistics teams.
 
@@ -46,6 +46,16 @@ Four user roles interact with the same live data:
 - **Financial Analyst** — fuel, expenses, and ROI reports
 
 Authentication is **email and password only** — users pick their role at signup. There is no Google OAuth or social login.
+
+---
+
+## 📸 Demo
+
+| Command Center | Fleet Registry | Live Trip Operations |
+|---|---|---|
+| <img alt="command-center" src="https://github.com/user-attachments/assets/cbc5763e-209c-4f39-a3b7-423f11ce103c" width="300" /> | <img alt="fleet-registry" src="https://github.com/user-attachments/assets/4552abab-ef70-4eaf-b801-25b5f71af2ec" width="300" /> | <img alt="live-trips" src="https://github.com/user-attachments/assets/fd258ae0-dfd7-42af-ae7a-75ce6e5e8a9a" width="300" /> |
+
+**Live app:** [transitops-pi.vercel.app](https://transitops-pi.vercel.app)
 
 ---
 
